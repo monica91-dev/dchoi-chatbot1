@@ -46,6 +46,9 @@ export async function moderate(rules: Rules, user: ChatUser, history: ChatMessag
       output_config: { effort: "low", format: zodOutputFormat(ModerationSchema) },
       system: `당신은 쇼핑몰 상담 챗봇의 대화 검토 담당자입니다. 아래 규칙에 따라 사용자의 "새 메시지"를 판정하세요.
 reason 에는 판단 이유를 한국어 한 문장으로 적으세요. 상품에 대한 평범한 질문은 risk "정상", action "none" 입니다.
+판정 대상은 오직 <새_메시지> 하나입니다. <최근_대화>는 기분과 맥락을 이해하는 데만 쓰세요.
+지난 메시지의 잘못은 이미 처리(경고 횟수에 반영)되었으므로, 새 메시지 자체가 규칙을 어기지 않았다면 action 은 반드시 "none" 입니다.
+차단 규칙의 "경고 뒤에도 같은 행동을 계속"은 새 메시지가 또 규칙을 어겼을 때만 해당합니다.
 
 <기분_파악_규칙>
 ${rules.mood}
