@@ -270,7 +270,7 @@ function QATab() {
     try {
       await api("/api/admin/qa", json(editing.id ? "PUT" : "POST", editing));
       setEditing(null);
-      setMsg("저장했어요. 다음 대화부터 챗봇에 반영돼요 (인터넷 버전은 최대 20초).");
+      setMsg("저장했어요. 다음 대화부터 챗봇이 바로 반영해요.");
       load();
     } catch (e) {
       alert((e as Error).message);

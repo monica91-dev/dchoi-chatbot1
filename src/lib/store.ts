@@ -44,19 +44,8 @@ const F = {
 type Users = Record<string, ChatUser>;
 
 function githubStore(gh: GitHubFiles): Store {
-  // Q&A·규칙·상품은 대화마다 읽으므로 잠깐(20초) 기억해서 GitHub 호출을 줄입니다
-  const memo = new Map<string, { at: number; value: unknown }>();
-  const cachedRead = async <T>(file: string): Promise<T | null> => {
-    const hit = memo.get(file);
-    if (hit && Date.now() - hit.at < 20_000) return hit.value as T | null;
-    const value = await gh.read<T>(file);
-    memo.set(file, { at: Date.now(), value });
-    return value;
-  };
-  const saveShared = async (file: string, value: unknown, message: string) => {
-    await gh.commit(message, async () => ({ [file]: value }));
-    memo.set(file, { at: Date.now(), value });
-  };
+  // 관리자가 고친 내용이 바로 반영되도록 매번 GitHub 에서 새로 읽습니다
+  const saveShared = (file: string, value: unknown, message: string) => gh.commit(message, async () => ({ [file]: value }));
 
   return {
     kind: "github",
@@ -82,11 +71,11 @@ function githubStore(gh: GitHubFiles): Store {
         [F.users]: { ...((await read<Users>(F.users)) ?? {}), [u.email]: u },
         [F.chat(u.email)]: [...((await read<ChatMessage[]>(F.chat(u.email))) ?? []), ...msgs],
       })),
-    getQA: async () => (await cachedRead<QAItem[]>(F.qa)) ?? (seedQA as QAItem[]),
+    getQA: async () => (await gh.read<QAItem[]>(F.qa)) ?? (seedQA as QAItem[]),
     saveQA: (qa) => saveShared(F.qa, qa, `Q&A 수정 (${qa.length}개)`),
-    getRules: async () => withDefaults(await cachedRead<Rules>(F.rules)),
+    getRules: async () => withDefaults(await gh.read<Rules>(F.rules)),
     saveRules: (r) => saveShared(F.rules, r, "챗봇 규칙 수정"),
-    getProducts: async () => (await cachedRead<Product[]>(F.products)) ?? (seedProducts as Product[]),
+    getProducts: async () => (await gh.read<Product[]>(F.products)) ?? (seedProducts as Product[]),
     saveProducts: (p) => saveShared(F.products, p, `상품목록 엑셀 올리기 (${p.length}개)`),
   };
 }

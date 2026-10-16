@@ -17,10 +17,13 @@ export class GitHubFiles {
   constructor(private cfg: GitHubConfig) {}
 
   private async call<T>(path: string, init: RequestInit = {}): Promise<{ status: number; body: T }> {
-    const res = await fetch(`${API}/repos/${this.cfg.repo}${path}`, {
+    // GitHub 는 같은 주소의 답을 최대 60초 재사용하므로, 읽을 때마다 주소 끝에 시간을 붙여 항상 새로 받습니다
+    const fresh = init.method ? "" : `${path.includes("?") ? "&" : "?"}_=${Date.now()}`;
+    const res = await fetch(`${API}/repos/${this.cfg.repo}${path}${fresh}`, {
       ...init,
       cache: "no-store",
       headers: {
+        "Cache-Control": "no-cache",
         Authorization: `Bearer ${this.cfg.token}`,
         Accept: "application/vnd.github+json",
         "X-GitHub-Api-Version": "2022-11-28",
