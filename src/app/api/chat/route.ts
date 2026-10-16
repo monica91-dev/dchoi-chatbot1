@@ -40,6 +40,7 @@ async function chat(req: Request) {
     async start(controller) {
       const send = (obj: object) => controller.enqueue(enc.encode(JSON.stringify(obj) + "\n"));
       const now = () => new Date().toISOString();
+      let answered = false; // 답변을 이미 다 보냈으면, 저장 오류가 나도 답변을 지우지 않습니다
 
       try {
         // 1) 검토
@@ -60,7 +61,7 @@ async function chat(req: Request) {
           user.messageCount += 1;
           user.lastSeenAt = now();
           const botMsg: ChatMessage = { role: "assistant", content: rules.blockMessage, at: now() };
-          await Promise.all([store.saveUser(user), store.appendMessages(email, [userMsg, botMsg])]);
+          await store.saveTurn(user, [userMsg, botMsg]);
           send({ type: "blocked", text: rules.blockMessage });
           controller.close();
           return;
@@ -99,13 +100,16 @@ async function chat(req: Request) {
         user.lastMood = mod.mood;
         user.messageCount += 1;
         user.lastSeenAt = now();
-        await Promise.all([
-          store.saveUser(user),
-          store.appendMessages(email, [userMsg, { role: "assistant", content: text, at: now() }]),
-        ]);
+        // 답변이 끝났다고 먼저 알려서 손님은 바로 다음 질문을 쓸 수 있게 하고, 그다음 저장합니다
         send({ type: "done" });
+        answered = true;
+        await store.saveTurn(user, [userMsg, { role: "assistant", content: text, at: now() }]);
       } catch (e) {
         console.error("chat failed", e);
+        if (answered) {
+          controller.close();
+          return;
+        }
         let msg = "잠시 문제가 생겼어요. 조금 뒤에 다시 시도해 주세요.";
         if (e instanceof ConfigError) msg = e.message;
         else if (e instanceof Anthropic.AuthenticationError) msg = "챗봇 API 키 설정에 문제가 있어요. 관리자에게 알려 주세요.";

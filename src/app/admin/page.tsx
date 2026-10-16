@@ -55,7 +55,7 @@ export default function AdminPage() {
         </h1>
         {state.storageWarning && (
           <div className="banner">
-            ⚠ 저장소(Upstash Redis)가 연결되지 않았습니다. 지금은 대화기록·수정 내용이 저장되지 않아요. 안내서 5단계를 확인해 주세요.
+            ⚠ GitHub 저장 설정(GITHUB_TOKEN)이 없습니다. 지금은 대화기록·수정 내용이 저장되지 않아요. 안내서 6단계를 확인해 주세요.
           </div>
         )}
         <div className="tabs">
@@ -270,7 +270,7 @@ function QATab() {
     try {
       await api("/api/admin/qa", json(editing.id ? "PUT" : "POST", editing));
       setEditing(null);
-      setMsg("저장했어요. 다음 대화부터 챗봇이 바로 반영해요.");
+      setMsg("저장했어요. 다음 대화부터 챗봇에 반영돼요 (인터넷 버전은 최대 20초).");
       load();
     } catch (e) {
       alert((e as Error).message);

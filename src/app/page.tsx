@@ -175,6 +175,7 @@ function Chat({ initial, blockedInitially, userName }: { initial: Msg[]; blocked
           const ev = JSON.parse(line);
           if (ev.type === "text") updateLast((m) => ({ ...m, content: m.content + ev.text }));
           else if (ev.type === "replace") updateLast((m) => ({ ...m, content: ev.text }));
+          else if (ev.type === "done") setBusy(false);
           else if (ev.type === "blocked") {
             setBlocked(ev.text);
             updateLast(() => ({ role: "notice", content: ev.text }));

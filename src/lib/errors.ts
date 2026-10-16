@@ -2,7 +2,7 @@
 export class ConfigError extends Error {}
 
 export const STORAGE_MISSING =
-  "저장소가 아직 연결되지 않았어요. 관리자는 Vercel → Storage 에서 Upstash Redis 를 연결한 뒤 Redeploy 해 주세요. (안내서 6단계)";
+  "저장소가 아직 연결되지 않았어요. 관리자는 Vercel 환경변수에 GITHUB_TOKEN 을 넣고 Redeploy 해 주세요. (안내서 6단계)";
 
 export function errorResponse(e: unknown) {
   console.error(e);

@@ -6,7 +6,7 @@ export async function GET() {
   return Response.json({
     admin: await isAdmin(),
     storage: getStore().kind,
-    // 버셀에서 Redis 를 연결하지 않으면 대화기록이 저장되지 않으므로 경고를 띄웁니다
+    // 버셀에서 GITHUB_TOKEN 을 넣지 않으면 대화기록이 저장되지 않으므로 경고를 띄웁니다
     storageWarning: !!process.env.VERCEL && getStore().kind === "file",
   });
 }

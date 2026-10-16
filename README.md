@@ -15,13 +15,14 @@ dchoi09.com **전집** 상품(153개)을 공부한 상담 챗봇이에요. Claud
 내 컴퓨터 (코드)  ──올리기──▶  GitHub (코드 보관함)  ──자동──▶  Vercel (인터넷에 공개)
                                                                  │
                                          Anthropic (Claude 두뇌) ◀┤
-                                         Upstash Redis (기억 상자) ◀┘
+                          GitHub chatbot-data 브랜치 (기억 상자) ◀┘
 ```
 
 - **GitHub**: 코드를 넣어 두는 보관함이에요.
 - **Vercel**: 보관함 속 코드를 꺼내서 누구나 들어올 수 있는 웹사이트로 만들어 줘요. GitHub에 새 코드가 올라가면 **알아서 다시 만들어요.**
 - **Anthropic API 키**: 챗봇 두뇌(Claude)를 쓰는 열쇠예요.
-- **Upstash Redis**: 대화기록, 고친 Q&A, 고친 규칙을 기억하는 상자예요. 이게 없으면 인터넷에서 기록이 남지 않아요.
+- **GitHub chatbot-data 브랜치**: 대화기록, 고친 Q&A, 고친 규칙을 기억하는 상자예요. 따로 데이터베이스를 쓰지 않고, 같은 GitHub 저장소의 **데이터 전용 브랜치**에 파일로 저장해요. 코드(main 브랜치)와 따로 있어서 저장할 때마다 Vercel이 다시 배포되지 않아요.
+- 상품목록과 기본 Q&A(엑셀 내용)는 처음부터 GitHub에 올린 `data/` 폴더에서 바로 읽어요.
 
 ---
 
@@ -85,13 +86,24 @@ git push
 
 4. **Deploy**를 누르고 1~2분 기다리면 `https://dchoi-chatbot1-xxxx.vercel.app` 같은 주소가 생겨요. 🎉
 
-### 6단계. 기억 상자(Upstash Redis) 연결하기 (한 번만, 꼭 해야 해요)
-이걸 안 하면 인터넷 버전에서 **대화기록이 저장되지 않아요.** 관리자 화면에 노란 경고도 떠요.
-1. Vercel에서 내 프로젝트를 열고 위쪽의 **Storage** 탭을 눌러요.
-2. **Create Database** (또는 Browse Marketplace)에서 **Upstash → Upstash for Redis**를 골라요.
-3. 무료 요금제(Free)와 가까운 지역(예: US East)을 고르고 **Create**를 눌러요.
-4. **Connect Project**에서 `dchoi-chatbot1`를 골라 연결해요. 그러면 `KV_REST_API_URL`, `KV_REST_API_TOKEN` 이 자동으로 들어가요.
-5. **Deployments** 탭에서 맨 위 항목의 **⋯ → Redeploy**를 눌러 다시 배포해요.
+### 6단계. 대화기록 저장 열쇠(GITHUB_TOKEN) 넣기 (한 번만, 꼭 해야 해요)
+이걸 안 하면 인터넷 버전에서 **상담 시작이 안 되고, 대화기록이 저장되지 않아요.**
+
+> ⚠️ **먼저 저장소를 비공개(Private)로 바꿔 주세요.** 손님 이름, 이메일, 대화가 이 저장소에 저장돼요.
+> 공개(Public) 저장소면 인터넷의 누구나 볼 수 있어요.
+> GitHub 저장소 → **Settings** → 맨 아래 **Danger Zone** → **Change visibility** → **Make private**
+
+1. https://github.com/settings/personal-access-tokens/new 를 열어요. (Fine-grained token 만들기)
+2. **Token name**: `dchoi-chatbot-data` / **Expiration**: 원하는 기간(예: 1년)
+3. **Repository access**: **Only select repositories** → `dchoi-chatbot1` 하나만 골라요.
+4. **Permissions → Repository permissions → Contents** 를 **Read and write** 로 바꿔요. (나머지는 그대로)
+5. 맨 아래 **Generate token** → `github_pat_` 로 시작하는 글자를 복사해요. (이 화면을 닫으면 다시 볼 수 없어요)
+6. Vercel 프로젝트 → **Settings → Environment Variables** 에서 Key `GITHUB_TOKEN`, Value 에 복사한 글자를 넣고 **Save**.
+7. **Deployments** 탭 → 맨 위 항목 **⋯ → Redeploy**.
+
+처음 대화가 저장되면 저장소에 `chatbot-data` 브랜치가 자동으로 생겨요. 그 안의 `data/users.json`(사용자), `data/chats/`(대화), `data/rules.json`(규칙), `data/qa.json`(Q&A)에 저장돼요. 저장할 때마다 커밋이 남아서, 예전 상태로 되돌릴 수도 있어요.
+
+> 💡 GitHub에 저장하는 방식이라 한 번 저장할 때 2~3초 걸리고, 1시간에 대화 150번 정도까지가 적당해요. 손님이 아주 많아지면 그때 데이터베이스로 바꾸는 걸 추천해요.
 
 ### 7단계. 이제부터는?
 - 코드를 고치면 **4단계(git push)만** 하면 돼요. Vercel이 자동으로 새 버전을 올려요.
@@ -121,6 +133,7 @@ src/app/page.tsx      손님 화면
 src/app/admin/        관리자 화면
 src/app/api/          서버 기능 (대화, 관리자 기능)
 src/lib/claude.ts     Claude 와 대화하는 부분
+src/lib/store.ts      저장소 (GitHub 데이터 브랜치 / 내 컴퓨터 .data 폴더)
 src/lib/defaults.ts   규칙 처음 값
 ```
 
@@ -128,8 +141,9 @@ src/lib/defaults.ts   규칙 처음 값
 | 증상 | 해결 |
 |---|---|
 | "API 키가 아직 설정되지 않았어요" | `.env.local` 또는 Vercel Environment Variables의 `ANTHROPIC_API_KEY` 확인 → Vercel은 Redeploy |
-| 관리자 화면에 노란 경고 | 6단계(Upstash Redis)를 해 주세요 |
-| 상담 시작 시 "저장소가 아직 연결되지 않았어요" | 6단계(Upstash Redis) 연결 → Redeploy |
+| 관리자 화면에 노란 경고 | 6단계(GITHUB_TOKEN)를 해 주세요 |
+| 상담 시작 시 "저장소가 아직 연결되지 않았어요" | 6단계(GITHUB_TOKEN) 넣기 → Redeploy |
+| "GitHub 접근이 거절됐어요" | 토큰 기간이 끝났거나 Contents 권한이 Read and write 가 아니에요. 새 토큰을 만들어 바꿔 넣어요 |
 | 상세 이미지 요약이 비어 있는 상품 | dchoi09 상세페이지에 이미지가 없고 출판사 사이트 링크만 있는 상품이에요 (26개). Q&A로 보충해 주세요 |
 | "챗봇 API 키 설정에 문제가 있어요" | 키가 틀렸거나 지워졌어요. 새 키를 만들어 넣어요 |
 | Vercel 배포가 빨간색(Error) | Deployments에서 그 항목을 눌러 빨간 글씨를 복사해 Claude에게 보여주세요 |
