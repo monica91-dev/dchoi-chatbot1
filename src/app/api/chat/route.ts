@@ -2,6 +2,7 @@
 // 브라우저로는 한 줄에 하나씩 JSON 을 보냅니다: {"type":"text","text":"..."} / {"type":"done"} / {"type":"blocked"} ...
 import { getUserEmail } from "@/lib/auth";
 import { Anthropic, moderate, streamReply } from "@/lib/claude";
+import { ConfigError, errorResponse } from "@/lib/errors";
 import { getStore } from "@/lib/store";
 import type { ChatMessage } from "@/lib/types";
 
@@ -11,6 +12,14 @@ export const maxDuration = 60; // 버셀에서 최대 60초까지 답변 허용
 const MAX_LEN = 2000;
 
 export async function POST(req: Request) {
+  try {
+    return await chat(req);
+  } catch (e) {
+    return errorResponse(e);
+  }
+}
+
+async function chat(req: Request) {
   if (!process.env.ANTHROPIC_API_KEY) {
     return Response.json({ error: "챗봇 API 키(ANTHROPIC_API_KEY)가 아직 설정되지 않았어요." }, { status: 500 });
   }
@@ -98,7 +107,8 @@ export async function POST(req: Request) {
       } catch (e) {
         console.error("chat failed", e);
         let msg = "잠시 문제가 생겼어요. 조금 뒤에 다시 시도해 주세요.";
-        if (e instanceof Anthropic.AuthenticationError) msg = "챗봇 API 키 설정에 문제가 있어요. 관리자에게 알려 주세요.";
+        if (e instanceof ConfigError) msg = e.message;
+        else if (e instanceof Anthropic.AuthenticationError) msg = "챗봇 API 키 설정에 문제가 있어요. 관리자에게 알려 주세요.";
         else if (e instanceof Anthropic.RateLimitError) msg = "지금 문의가 많아요. 잠시 뒤에 다시 시도해 주세요.";
         send({ type: "error", text: msg });
       }

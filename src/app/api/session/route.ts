@@ -1,11 +1,20 @@
 // 사용자가 이름+이메일을 남기고 상담을 시작하는 곳
 import { clearUserSession, getUserEmail, setUserSession } from "@/lib/auth";
+import { errorResponse } from "@/lib/errors";
 import { getStore } from "@/lib/store";
 import type { ChatUser } from "@/lib/types";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export async function GET() {
+  try {
+    return await currentSession();
+  } catch (e) {
+    return errorResponse(e);
+  }
+}
+
+async function currentSession() {
   const email = await getUserEmail();
   if (!email) return Response.json({ user: null });
   const store = getStore();
@@ -26,6 +35,14 @@ export async function POST(req: Request) {
   if (!name) return Response.json({ error: "이름을 입력해 주세요." }, { status: 400 });
   if (!EMAIL_RE.test(email)) return Response.json({ error: "이메일 주소를 확인해 주세요." }, { status: 400 });
 
+  try {
+    return await startSession(name, email);
+  } catch (e) {
+    return errorResponse(e);
+  }
+}
+
+async function startSession(name: string, email: string) {
   const store = getStore();
   const now = new Date().toISOString();
   const existing = await store.getUser(email);

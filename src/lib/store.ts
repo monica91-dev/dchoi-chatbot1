@@ -7,6 +7,7 @@ import { Redis } from "@upstash/redis";
 import seedProducts from "../../data/products.json";
 import seedQA from "../../data/qa.json";
 import { DEFAULT_RULES } from "./defaults";
+import { ConfigError, STORAGE_MISSING } from "./errors";
 import type { ChatMessage, ChatUser, Product, QAItem, Rules } from "./types";
 
 export interface Store {
@@ -88,6 +89,8 @@ function fileStore(): Store {
   const read = (): FileDB =>
     fs.existsSync(file) ? JSON.parse(fs.readFileSync(file, "utf8")) : { users: {}, msgs: {} };
   const write = (db: FileDB) => {
+    // 버셀은 파일 저장이 막혀 있어서 Redis 가 꼭 필요합니다
+    if (process.env.VERCEL) throw new ConfigError(STORAGE_MISSING);
     fs.mkdirSync(path.dirname(file), { recursive: true });
     fs.writeFileSync(file, JSON.stringify(db, null, 2));
   };

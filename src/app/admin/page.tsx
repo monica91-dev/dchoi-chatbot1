@@ -1,6 +1,7 @@
 "use client";
 // 운영자 페이지: 대화기록 / Q&A / 학습 상품 / 챗봇 규칙
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { RichText } from "../RichText";
 import type { ChatMessage, ChatUser, Product, QAItem, Rules } from "@/lib/types";
 
 type Tab = "users" | "qa" | "products" | "rules";
@@ -222,7 +223,9 @@ function UsersTab() {
                     <div className="caption who">
                       {m.role === "user" ? "USER" : "BOT"} · {fmt(m.at)}
                     </div>
-                    <div className="bubble">{m.content}</div>
+                    <div className="bubble">
+                      <RichText text={m.content} />
+                    </div>
                     {m.role === "user" && m.mood && (
                       <div className="caption" style={{ marginTop: 4, color: m.action === "none" ? undefined : "var(--warning)" }}>
                         기분 {m.mood} · 판별 {m.risk}

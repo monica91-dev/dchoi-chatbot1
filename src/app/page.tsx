@@ -1,6 +1,7 @@
 "use client";
 // 사용자 페이지: 이름+이메일 입력 → 챗봇과 대화
 import { useEffect, useRef, useState } from "react";
+import { RichText } from "./RichText";
 
 interface Msg {
   role: "user" | "assistant" | "notice";
@@ -19,6 +20,7 @@ export default function Home() {
   useEffect(() => {
     fetch("/api/session")
       .then((r) => r.json())
+      .catch(() => ({}))
       .then((d) => {
         if (d.user) {
           setUser(d.user);
@@ -71,14 +73,19 @@ function Welcome({ name, setName }: { name: string; setName: (s: string) => void
     e.preventDefault();
     setBusy(true);
     setError("");
-    const res = await fetch("/api/session", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, email }),
-    });
-    const d = await res.json();
-    setBusy(false);
-    if (!res.ok) return setError(d.error ?? "다시 시도해 주세요.");
+    try {
+      const res = await fetch("/api/session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email }),
+      });
+      const d = await res.json().catch(() => ({}));
+      if (!res.ok) return setError(d.error ?? `서버 오류가 생겼어요 (${res.status}). 잠시 뒤 다시 시도해 주세요.`);
+    } catch {
+      return setError("인터넷 연결을 확인하고 다시 시도해 주세요.");
+    } finally {
+      setBusy(false);
+    }
     // 예전에 대화한 적이 있으면 기록을 불러오기 위해 새로고침
     window.location.reload();
   };
@@ -196,7 +203,9 @@ function Chat({ initial, blockedInitially, userName }: { initial: Msg[]; blocked
           return (
             <div key={i} className={`msg ${m.role}`}>
               <div className="caption who">{m.role === "user" ? "YOU" : m.role === "notice" ? "NOTICE" : "CONCIERGE"}</div>
-              <div className={`bubble ${streaming ? "typing" : ""}`}>{m.content}</div>
+              <div className={`bubble ${streaming ? "typing" : ""}`}>
+                <RichText text={m.content} />
+              </div>
             </div>
           );
         })}

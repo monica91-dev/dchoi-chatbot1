@@ -1,13 +1,14 @@
 // 로그인 정보를 쿠키에 안전하게(서명해서) 저장하는 도구
 import crypto from "node:crypto";
 import { cookies } from "next/headers";
+import { ConfigError } from "./errors";
 
 const USER_COOKIE = "dchoi_user";
 const ADMIN_COOKIE = "dchoi_admin";
 
 function secret(): string {
   const s = process.env.SESSION_SECRET || process.env.ADMIN_PASSWORD;
-  if (!s) throw new Error("SESSION_SECRET 환경변수가 없습니다.");
+  if (!s) throw new ConfigError("SESSION_SECRET 환경변수가 없어요. Vercel → Settings → Environment Variables 에 넣고 Redeploy 해 주세요.");
   return s;
 }
 
