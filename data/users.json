@@ -9,5 +9,16 @@
     "lastMood": "궁금",
     "messageCount": 6,
     "blockedReason": ""
+  },
+  "e2e2@example.com": {
+    "email": "e2e2@example.com",
+    "name": "김새봄",
+    "createdAt": "2026-10-16T10:22:17.605Z",
+    "lastSeenAt": "2026-10-16T10:22:17.605Z",
+    "status": "active",
+    "warnings": 0,
+    "lastMood": "",
+    "messageCount": 0,
+    "blockedReason": ""
   }
 }
