@@ -89,9 +89,8 @@ git push
 ### 6단계. 대화기록 저장 열쇠(GITHUB_TOKEN) 넣기 (한 번만, 꼭 해야 해요)
 이걸 안 하면 인터넷 버전에서 **상담 시작이 안 되고, 대화기록이 저장되지 않아요.**
 
-> ⚠️ **먼저 저장소를 비공개(Private)로 바꿔 주세요.** 손님 이름, 이메일, 대화가 이 저장소에 저장돼요.
-> 공개(Public) 저장소면 인터넷의 누구나 볼 수 있어요.
-> GitHub 저장소 → **Settings** → 맨 아래 **Danger Zone** → **Change visibility** → **Make private**
+> ℹ️ 지금은 연습용이라 공개(Public) 저장소를 그대로 써요. 공개 저장소에 저장된 대화는 누구나 볼 수 있으니,
+> **실제 고객 정보를 받게 되면** 저장소를 비공개로 바꿔 주세요. (Settings → Danger Zone → Change visibility → Make private)
 
 1. https://github.com/settings/personal-access-tokens/new 를 열어요. (Fine-grained token 만들기)
 2. **Token name**: `dchoi-chatbot-data` / **Expiration**: 원하는 기간(예: 1년)
