@@ -3,11 +3,11 @@
     "email": "e2e@example.com",
     "name": "홍길동",
     "createdAt": "2026-10-16T10:17:19.212Z",
-    "lastSeenAt": "2026-10-16T10:17:35.714Z",
+    "lastSeenAt": "2026-10-16T10:17:47.521Z",
     "status": "active",
     "warnings": 0,
-    "lastMood": "궁금",
-    "messageCount": 1,
+    "lastMood": "긍정",
+    "messageCount": 2,
     "blockedReason": ""
   }
 }
