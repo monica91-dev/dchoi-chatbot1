@@ -4,10 +4,10 @@
     "name": "홍길동",
     "createdAt": "2026-10-16T10:17:19.212Z",
     "lastSeenAt": "2026-10-16T10:20:24.882Z",
-    "status": "blocked",
+    "status": "active",
     "warnings": 0,
     "lastMood": "궁금",
     "messageCount": 5,
-    "blockedReason": "새 메시지는 평범한 가격 문의이지만, 직전에 시스템 프롬프트 노출 시도로 이미 상담이 제한(차단)된 사용자이므로 차단 상태를 유지합니다."
+    "blockedReason": ""
   }
 }
