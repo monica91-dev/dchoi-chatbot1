@@ -15,7 +15,7 @@ export interface Product {
   description: string; // 상세페이지의 텍스트
   detailImages: string[]; // 상세페이지 이미지 주소
   externalLinks: string[]; // 상세페이지 안의 외부 소개 링크
-  detailSummary: string; // 상세 이미지를 AI가 읽고 정리한 요약 (npm run enrich)
+  detailSummary: string; // 상세 이미지를 AI가 읽고 정리한 요약 (npm run enrich, 긴 이미지는 잘라서 읽음)
   updatedAt: string;
 }
 

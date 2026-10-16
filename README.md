@@ -129,5 +129,7 @@ src/lib/defaults.ts   규칙 처음 값
 |---|---|
 | "API 키가 아직 설정되지 않았어요" | `.env.local` 또는 Vercel Environment Variables의 `ANTHROPIC_API_KEY` 확인 → Vercel은 Redeploy |
 | 관리자 화면에 노란 경고 | 6단계(Upstash Redis)를 해 주세요 |
+| 상담 시작 시 "저장소가 아직 연결되지 않았어요" | 6단계(Upstash Redis) 연결 → Redeploy |
+| 상세 이미지 요약이 비어 있는 상품 | dchoi09 상세페이지에 이미지가 없고 출판사 사이트 링크만 있는 상품이에요 (26개). Q&A로 보충해 주세요 |
 | "챗봇 API 키 설정에 문제가 있어요" | 키가 틀렸거나 지워졌어요. 새 키를 만들어 넣어요 |
 | Vercel 배포가 빨간색(Error) | Deployments에서 그 항목을 눌러 빨간 글씨를 복사해 Claude에게 보여주세요 |
