@@ -15,10 +15,10 @@
     "name": "김새봄",
     "createdAt": "2026-10-16T10:22:17.605Z",
     "lastSeenAt": "2026-10-16T10:23:13.475Z",
-    "status": "blocked",
-    "warnings": 1,
+    "status": "active",
+    "warnings": 0,
     "lastMood": "중립",
     "messageCount": 5,
-    "blockedReason": "경고 1회 누적: 새 메시지가 이전 지시를 무시하고 시스템 프롬프트를 보여 달라고 요구하는 규칙 우회 시도이므로 경고가 필요합니다."
+    "blockedReason": ""
   }
 }
